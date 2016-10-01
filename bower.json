@@ -1,0 +1,27 @@
+{
+	"name": "kbw-plugin",
+	"description": "A base for jQuery collection plugins, providing common abilities around instantiation, option handling, method handling, and destruction.",
+	"keywords": [
+		"jQuery",
+		"plugin"
+	],
+	"homepage": "https://github.com/kbwood/plugin",
+	"authors": [
+		"Keith Wood <wood.keith@optusnet.com.au> (http://keith-wood.name)"
+	],
+	"licence": "MIT",
+	"main": [
+		"src/js/jquery.plugin.js"
+	],
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"src/bower_components"
+	],
+	"dependencies": {
+		"jquery": ">=1.12.0"
+	},
+	"devDependencies": {
+		"qunit": "~1.23"
+	}
+}
