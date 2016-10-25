@@ -78,13 +78,13 @@
 		return JQClass;
 	};
 })();
-/*! Abstract base class for collection plugins v1.0.3.
+/*! Abstract base class for collection plugins v1.0.2.
 	Written by Keith Wood (wood.keith{at}optusnet.com.au) December 2013.
 	Licensed under the MIT license (http://keith-wood.name/licence.html). */
 (function($) { // Ensure $, encapsulate
 	'use strict';
 
-	/** <p>Abstract base class for collection plugins v1.0.3.</p>
+	/** <p>Abstract base class for collection plugins v1.0.2.</p>
 		<p>Written by Keith Wood (wood.keith{at}optusnet.com.au) December 2013.</p>
 		<p>Licensed under the MIT license (http://keith-wood.name/licence.html).</p>
 		<p>Use {@link $.JQPlugin.createPlugin} to create new plugins using this framework.</p>

@@ -26,12 +26,14 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/*! Simple JavaScript Inheritance
+            <pre class="prettyprint source linenums"><code>/* globals JQClass */
+/*! Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
  */
 // Inspired by base2 and Prototype
 (function(){
+	'use strict';
 	var initializing = false;
 
 	// The base JQClass implementation (does nothing)
@@ -50,7 +52,7 @@
 		initializing = false;
 
 		// Copy the properties over onto the new prototype
-		for (var name in prop) {
+		for (var name in prop) { // jshint loopfunc:true
 			// Check if we're overwriting an existing function
 			if (typeof prop[name] === 'function' &amp;&amp; typeof base[name] === 'function') {
 				prototype[name] = (function (name, fn) {
@@ -65,18 +67,18 @@
 						this._super = __super;
 						return ret;
 					};
-				})(name, prop[name]); //jshint ignore:line
+				})(name, prop[name]);
 			// Check if we're overwriting existing default options.
 			} else if (typeof prop[name] === 'object' &amp;&amp; typeof base[name] === 'object' &amp;&amp; name === 'defaultOptions') {
 				var obj1 = base[name];
 				var obj2 = prop[name];
 				var obj3 = {};
-				var attrname;
-				for (attrname in obj1) {
-					obj3[attrname] = obj1[attrname];
+				var key;
+				for (key in obj1) { // jshint forin:false
+					obj3[key] = obj1[key];
 				}
-				for (attrname in obj2) {
-					obj3[attrname] = obj2[attrname];
+				for (key in obj2) { // jshint forin:false
+					obj3[key] = obj2[key];
 				}
 				prototype[name] = obj3;
 			} else {
@@ -108,6 +110,7 @@
 	Written by Keith Wood (wood.keith{at}optusnet.com.au) December 2013.
 	Licensed under the MIT license (http://keith-wood.name/licence.html). */
 (function($) { // Ensure $, encapsulate
+	'use strict';
 
 	/** &lt;p>Abstract base class for collection plugins v1.0.2.&lt;/p>
 		&lt;p>Written by Keith Wood (wood.keith{at}optusnet.com.au) December 2013.&lt;/p>
@@ -227,14 +230,18 @@
 		/** Retrieve additional instance settings.
 			Override this in a sub-class to provide extra settings.
 			These are added directly to the instance object.
+			Default attributes of an instance object are shown as properties below:
 			@protected
 			@param {jQuery} elem The current jQuery element.
 			@param {object} options The instance options.
 			@return {object} Any extra instance values.
+			@property {Element} elem The element to which this instance applies.
+			@property {string} name The name of this plugin.
+			@property {object} options The accumulated options for this instance.
 			@example _instSettings: function(elem, options) {
   return {nav: elem.find(options.navSelector)};
 } */
-		_instSettings: function(elem, options) {
+		_instSettings: function(elem, options) { // jshint unused:false
 			return {};
 		},
 
@@ -249,9 +256,9 @@
     ...
   });
 } */
-		_postAttach: function(elem, inst) {
+		_postAttach: function(elem, inst) { // jshint unused:false
 		},
-
+		
 		/** Retrieve metadata configuration from the element.
 			Metadata is specified as an attribute:
 			&lt;code>data-&amp;lt;pluginName>="&amp;lt;option name>: '&amp;lt;value>', ..."&lt;/code>.
@@ -263,16 +270,18 @@
 			try {
 				var data = elem.data(this.name.toLowerCase()) || '';
 				data = data.replace(/(\\?)'/g, function(e, t) {
-					return t ? "'" : '"';
-				}).replace(/([a-zA-Z0-9]+):/g, function(match, group, i) { 
+					return t ? '\'' : '"';
+				}).replace(/([a-zA-Z0-9]+):/g, function(match, group, i) {
 					var count = data.substring(0, i).match(/"/g); // Handle embedded ':'
 					return (!count || count.length % 2 === 0 ? '"' + group + '":' : group + ':');
-				}).replace(/\\:/g, ":");
+				}).replace(/\\:/g, ':');
 				data = $.parseJSON('{' + data + '}');
-				for (var name in data) { // Convert dates
-					var value = data[name];
-					if (typeof value === 'string' &amp;&amp; value.match(/^new Date\(([-0-9,\s]*)\)$/)) {
-						data[name] = eval(value); //jshint ignore:line
+				for (var key in data) {
+					if (data.hasOwnProperty(key)) {
+						var value = data[key];
+						if (typeof value === 'string' &amp;&amp; value.match(/^new Date\(([-0-9,\s]*)\)$/)) { // Convert dates
+							data[key] = eval(value); // jshint ignore:line
+						}
 					}
 				}
 				return data;
@@ -335,7 +344,7 @@ var options = $(selector).plugin('option') // Get all options */
     elem.removeClass(inst.options.name).addClass(options.name);
   }
 } */
-		_optionsChanged: function(elem, inst, options) {
+		_optionsChanged: function(elem, inst, options) { // jshint unused:false
 		},
 
 		/** Remove all trace of the plugin.
@@ -362,7 +371,7 @@ var options = $(selector).plugin('option') // Get all options */
 			@example _preDestroy: function(elem, inst) {
   elem.off('.' + this.name);
 } */
-		_preDestroy: function(elem, inst) {
+		_preDestroy: function(elem, inst) { // jshint unused:false
 		}
 	});
 
@@ -400,7 +409,7 @@ $('selector').tabs(); // And instantiate it */
 			superClass = camelCase(superClass);
 			var className = camelCase(overrides.name);
 			JQClass.classes[className] = JQClass.classes[superClass].extend(overrides);
-			new JQClass.classes[className]();
+			new JQClass.classes[className](); // jshint ignore:line
 		}
 	};
 
@@ -420,7 +429,7 @@ $('selector').tabs(); // And instantiate it */
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Sat Oct 01 2016 18:08:24 GMT+1000 (AUS Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Tue Oct 25 2016 19:04:23 GMT+1100 (AUS Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

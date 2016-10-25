@@ -4,20 +4,19 @@ module.exports = function (grunt) {
 	require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
 	var config = {
+		pkg: grunt.file.readJSON('package.json'),
 		clean: {
-			build: {
+			build: ['dist/*', 'doc/*', 'report/*', 'temp/*'],
+			tests: ['test/*.min.tests.html']
+		},
+		copy: {
+			dist: {
 				files: [
 					{
-						dot: true,
-						src: ['dist/*', '!dist/.git', 'doc/*']
-					}
-				]
-			},
-			tests: {
-				files: [
-					{
-						dot: true,
-						src: ['test/*.min.tests.html']
+						expand: true,
+						cwd: 'src',
+						src: ['*.html', 'css/*.*', 'img/*.*', 'js/*.*'],
+						dest: 'dist'
 					}
 				]
 			}
@@ -27,23 +26,38 @@ module.exports = function (grunt) {
 				destination: 'doc'
 			},
 			all: {
-				src: ['src/js/jquery.*.js'],
+				src: ['src/js/*.js'],
 			}
 		},
 		jshint: {
-			all: ['src/js/jquery.*.js']
+			options: {
+				jshintrc: true
+			},
+			all: ['src/js/*.js']
 		},
 		qunit: {
-			all: ['test/**/*.html']
+			options: {
+				coverage: {
+					disposeCollector: true,
+					src: ['src/js/*.js', '!src/js/*-*.js'],
+					instrumentedFiles: 'temp/',
+					htmlReport: 'report/',
+					linesThresholdPct: 95,
+					statementsThresholdPct: 95,
+					functionsThresholdPct: 95,
+					branchesThresholdPct: 90
+				}
+			},
+			all: ['test/*.html']
 		},
 		replace: {
-			mintest: {
+			testmin: {
 				src: ['test/plugin.tests.html'],
 				dest: 'test/plugin.min.tests.html',
 				replacements: [
-				    {
+					{
 						from: /src\/js\/jquery\.(.*)\.js/g,
-						to: 'dist/jquery.$1.min.js'
+						to: 'dist/js/jquery.$1.min.js'
 					}
 				]
 			}
@@ -54,26 +68,38 @@ module.exports = function (grunt) {
 				sourceMap: true
 			},
 			plugin: {
-				files: {
-					'dist/jquery.plugin.min.js': ['src/js/jquery.plugin.js']
-				}
+				files: [
+					{
+						expand: true,
+						cwd: 'src/js',
+						src: ['*.js', '!*-*.js'],
+						dest: 'dist/js',
+						ext: '.min.js',
+						extDot: 'last'
+					}
+				]
 			}
 		}
 	};
 	
 	grunt.initConfig(config);
 
-	grunt.registerTask('test', [
-		'replace',
-		'qunit',
-		'clean:tests'
-	]);
-
-	grunt.registerTask('build', [
+	grunt.registerTask('default', [
 		'clean:build',
 		'jshint',
 		'uglify',
 		'test',
-		'jsdoc'
+		'jsdoc',
+		'dist'
+	]);
+
+	grunt.registerTask('dist', [
+		'copy:dist'
+	]);
+
+	grunt.registerTask('test', [
+		'replace',
+		'qunit',
+		'clean:tests'
 	]);
 };
